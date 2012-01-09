@@ -8,6 +8,10 @@ module HireFire
       # Include HireFire::Backend helpers
       include HireFire::Backend
 
+      def alert_if_stale
+        raise 'BAHHHHH' unless jobs.where('created_at >= ?', 2.minutes.ago).empty?
+      end
+
       ##
       # This method gets invoked when a new job has been queued
       #
@@ -62,6 +66,8 @@ module HireFire
       def hire
         jobs_count    = jobs
         workers_count = workers || return
+
+        alert_if_stale if jobs_count > 0
 
         ##
         # Use "Standard Notation"
